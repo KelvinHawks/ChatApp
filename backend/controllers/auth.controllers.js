@@ -55,7 +55,7 @@ export const login = async (req, res) => {
     );
 
     if (!user || !isPasswordCorrect) {
-      return res.status(400).json({ error: "Invalid username ro password" });
+      return res.status(400).json({ error: "Invalid username or password" });
     }
 
     generateToken(user._id, res);
