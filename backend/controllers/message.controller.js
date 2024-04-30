@@ -1,5 +1,7 @@
 import Conversation from "../models/conversation.model.js";
 import Message from "../models/message.model.js";
+import { getRecieverSocketId } from "../socket/socket.js";
+import { io } from "../socket/socket.js";
 export const sendMessage = async (req, res) => {
   try {
     const { message } = req.body;
@@ -25,10 +27,16 @@ export const sendMessage = async (req, res) => {
       conversation.messages.push(newMessage._id);
     }
 
-    //socket.io functionality will go here
     //learn in parallel
     await Promise.all([conversation.save(), newMessage.save()]);
+    //socket.io functionality will go here
 
+    const recieverSockedId = getRecieverSocketId(receiverId);
+
+    if (receiverId) {
+      //send to a specific client
+      io.to(recieverSockedId).emit("newMessage", newMessage);
+    }
     res.status(201).json(newMessage);
   } catch (error) {
     console.log("Error in message controler", error.message);
